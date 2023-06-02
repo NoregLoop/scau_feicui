@@ -1,0 +1,6 @@
+
+deployment:
+  - name: scau_feicui
+    type: docker
+    configVars:
+      - PORT: 80
