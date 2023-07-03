@@ -1,8 +1,13 @@
 <template>
     <div class="app-container home">
         <h3>这是首页</h3>
+
+
     </div>
 </template>
+<script setup>
+
+</script>
 
 <style rel="stylesheet/scss" lang="scss">
     .app-container home{

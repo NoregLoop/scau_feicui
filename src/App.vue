@@ -1,28 +1,32 @@
 <template>
-  <nav>
-  </nav>
   <div id="app">
-  <!-- 其他页 -->
-  <el-container v-if="$route.meta.keepAlive">
-   <el-header>
-    <!-- 导航栏 -->
-    <keep-alive>
-     <header-nav></header-nav>
-    </keep-alive>
-   </el-header>
-  <el-container>
-   <el-aside width="250px">
-    <!-- 侧边栏 -->
-    <keep-alive>
-     <left></left>
-    </keep-alive>
-   </el-aside>
-   <el-main>
-    <!-- Body -->
-     <router-view></router-view>
-   </el-main>
-  </el-container>
-  </el-container>
+    <!-- 其他页 -->
+    <el-container v-if="$route.meta.keepAlive">
+      <el-header>
+        <!-- 导航栏 -->
+        <keep-alive>
+          <top></top>
+        </keep-alive>
+      </el-header>
+      <el-container>
+        <el-aside width="sideWidth+'px'">
+          <!-- 侧边栏 -->
+          <keep-alive>
+            <left></left>
+          </keep-alive>
+        </el-aside>
+        <el-main style="padding-top: 0;">
+          <!-- Body -->
+          <el-config-provider :locale="locale"> <!-- 中文配置-->
+            <router-view v-slot="{ Component, route }">
+              <transition :name="route.meta.transition">
+                <component :is="Component" />
+              </transition>
+            </router-view>
+          </el-config-provider>
+        </el-main>
+      </el-container>
+    </el-container>
 
     <!-- 登录页 -->
     <router-view v-if="!$route.meta.keepAlive"></router-view>
@@ -30,15 +34,24 @@
 </template>
 <script>
 import left from '@/layout/left.vue';
-import { useRoute, useRouter } from 'vue-router'
-const route=useRoute()
- 
-export default{
+import top from '@/layout/top.vue'
+import { ref } from 'vue';
+import { ElConfigProvider } from 'element-plus';
+import locale from 'element-plus/lib/locale/lang/zh-cn'
+export default {
   components: {
-    left: left
-   }
+    left: left,
+    top: top
+  },
+  setup() {
+    const sideWidth = ref(180)
+
+    return {
+
+    }
+  }
 }
- 
+
 </script>
 <style>
 #app {
@@ -47,18 +60,15 @@ export default{
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  background-color: #F8F8F8;
 }
 
-nav {
-  padding: 30px;
+body {
+  margin: 0;
+  padding: 0;
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
+top {
+  width: 100%;
 }
 </style>

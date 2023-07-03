@@ -1,18 +1,14 @@
 import request from '@/utils/request'
 
 // 登录方法
-export function login(username, password, code, uuid) {
-  const data = {
-    username,
-    password,
-  }
+export function login(user) {
   return request({
-    url: 'http://119.29.215.204:8888/img/get',
+    url: '/login',
     headers: {
       isToken: false
     },
     method: 'post',
-    data: data
+    data: user
   })
 }
 
@@ -32,10 +28,22 @@ export function register(data) {
 export function getInfo() {
   return request({
     url: '/getInfo',
+    headers: {
+      isToken: true
+    },
     method: 'get'
   })
 }
-
+// 获取用户详细路由
+export function getRouters() {
+  return request({
+    url: '/getRouters',
+    headers: {
+      isToken: true
+    },
+    method: 'get'
+  })
+}
 // 退出方法
 export function logout() {
   return request({

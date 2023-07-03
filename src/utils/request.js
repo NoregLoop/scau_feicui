@@ -1,11 +1,11 @@
 import axios from 'axios'
-import { Notification, MessageBox, ElMessage, Loading } from 'element-plus'
+import { Notification, ElMessageBox, ElMessage, Loading } from 'element-plus'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 import errorCode from '@/utils/errorCode'
 import { tansParams, blobValidate } from "@/utils/ruoyi";
 import cache from '@/plugins/cache'
-// import { saveAs } from 'file-saver'
+
 
 let downloadLoadingInstance;
 // 是否显示重新登录
@@ -15,7 +15,7 @@ axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 // 创建axios实例
 const service = axios.create({
   // axios中请求配置有baseURL选项，表示请求URL公共部分
-  baseURL: process.env.VUE_APP_BASE_API,
+  baseURL:"http://47.106.116.146:8080/",
   // 超时
   timeout: 10000
 })
@@ -76,27 +76,27 @@ service.interceptors.response.use(res => {
       return res.data
     }
     if (code === 401) {
-      if (!isRelogin.show) {
+      if (isRelogin.show) {// if (!isRelogin.show) 
         isRelogin.show = true;
-        MessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', { confirmButtonText: '重新登录', cancelButtonText: '取消', type: 'warning' }).then(() => {
+        ElMessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', { confirmButtonText: '重新登录', cancelButtonText: '取消', type: 'warning' }).then(() => {
           isRelogin.show = false;
           store.dispatch('LogOut').then(() => {
-            location.href = '/index';
+            location.href = '/login';
           })
       }).catch(() => {
         isRelogin.show = false;
       });
     }
       return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
-    } else if (code === 500) {
-      Message({ message: msg, type: 'error' })
-      return Promise.reject(new Error(msg))
-    } else if (code === 601) {
-      Message({ message: msg, type: 'warning' })
-      return Promise.reject('error')
-    } else if (code !== 200) {
-      Notification.error({ title: msg })
-      return Promise.reject('error')
+    // } else if (code === 500) {
+    //   ElMessage({ message: msg, type: 'error' })
+    //   return Promise.reject(new Error(msg))
+    // } else if (code === 601) {
+    //   ElMessage({ message: msg, type: 'warning' })
+    //   return Promise.reject('error')
+    // } else if (code !== 200) {
+    //   Notification.error({ title: msg })
+    //   return Promise.reject('error')
     } else {
       return res.data
     }
@@ -116,31 +116,6 @@ service.interceptors.response.use(res => {
   }
 )
 
-// 通用下载方法
-export function download(url, params, filename, config) {
-  downloadLoadingInstance = Loading.service({ text: "正在下载数据，请稍候", spinner: "el-icon-loading", background: "rgba(0, 0, 0, 0.7)", })
-  return service.post(url, params, {
-    transformRequest: [(params) => { return tansParams(params) }],
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    responseType: 'blob',
-    ...config
-  }).then(async (data) => {
-    const isBlob = blobValidate(data);
-    if (isBlob) {
-      const blob = new Blob([data])
-      saveAs(blob, filename)
-    } else {
-      const resText = await data.text();
-      const rspObj = JSON.parse(resText);
-      const errMsg = errorCode[rspObj.code] || rspObj.msg || errorCode['default']
-      ElMessage.error(errMsg);
-    }
-    downloadLoadingInstance.close();
-  }).catch((r) => {
-    console.error(r)
-    Elmessage.error('下载文件出现错误，请联系管理员！')
-    downloadLoadingInstance.close();
-  })
-}
+
 
 export default service
