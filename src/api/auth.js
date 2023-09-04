@@ -45,7 +45,7 @@ export function addUser(userForm) {//添加用户
         data: userForm
     })
 }
-export function updateUser(userForm) {//删除用户
+export function updateUser(userForm) {//编辑用户
     return request({
         url: '/system/user/',
         headers: {
@@ -125,6 +125,16 @@ export function addTenant(tenantForm) {//新增租户
             isToken: true
         },
         method: 'post',
+        data: tenantForm
+    })
+}
+export function updateTenant(tenantForm) {//编辑租户
+    return request({
+        url: '/system/tenant/',
+        headers: {
+            isToken: true
+        },
+        method: 'put',
         data: tenantForm
     })
 }

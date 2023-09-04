@@ -7,12 +7,6 @@
             <el-form-item class="input" label="手机号">
                 <el-input v-model="searchForm.name" />
             </el-form-item>
-            <el-form-item class="input" label="状态">
-                <el-select v-model="searchForm.name" placeholder="请选择">
-                    <el-option label="启用" value="shanghai" />
-                    <el-option label="停用" value="beijing" />
-                </el-select>
-            </el-form-item>
         </el-form>
         <el-button class="search" type="primary">查询</el-button>
     </div>
@@ -20,20 +14,22 @@
     <div class="tail">
         <div class="tail-action">
             <el-button type="primary" @click="dialogVisible1 = true">新增租户</el-button>
-            <el-button type="primary">启用</el-button>
         </div>
         <el-table :data="tableData()" border style="width: 100%">
             <el-table-column type="selection" min-width="40" />
             <el-table-column type="index" lable="序号" min-width="40" />
-            <el-table-column prop="tenantId" label="租户ID" min-width="60" />
+            <el-table-column prop="tenantCode" label="租户编码" min-width="60" />
             <el-table-column prop="tenantName" label="租户名称" min-width="60" />
             <el-table-column prop="phonenumber" label="手机号" min-width="60" />
+            <el-table-column prop="address" label="租户地址" min-width="60" />
+            <el-table-column prop="remark" label="备注" min-width="60" />
+            <el-table-column prop="email" label="租户邮箱" min-width="60" />
             <el-table-column prop="createTime" label="创建时间" min-width="60" />
             <el-table-column fixed="right" label="Operations" width="120PX">
                 <template #default="scope">
-                    <el-button link type="primary" size="small" @click="dialogVisible2 = true">编辑</el-button>
+                    <el-button link type="primary" size="small" @click="handleOpenEdit(scope.row)">编辑</el-button>
                     <el-button link type="primary" size="small"
-                        @click="handleDeleteTenant(scope.row.tenantId)">删除</el-button>
+                        @click="handleDeleteTenant(scope.row.tenantCode)">删除</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -102,26 +98,26 @@
                         <el-input v-model="tenantForm.tenantName" />
                     </el-form-item>
                     <el-form-item label="手机电话">
-                        <el-input v-model="tenantForm.phone" />
+                        <el-input v-model="tenantForm.phonenumber" />
                     </el-form-item>
-                    <el-form-item label="租户账号">
-                        <el-input v-model="tenantForm.account" />
+                    <el-form-item label="租户地址">
+                        <el-input v-model="tenantForm.address" />
                     </el-form-item>
-                    <el-form-item label="租户密码">
-                        <el-input v-model="tenantForm.password" />
+                    <el-form-item label="备注">
+                        <el-input v-model="tenantForm.remark" />
                     </el-form-item>
-                    <el-form-item label="角色选择">
-                        <el-select v-model="tenantForm.role" placeholder="请选择该用户角色">
-                            <el-option label="采购" value="shanghai" />
-                            <el-option label="管理" value="beijing" />
-                        </el-select>
+                    <el-form-item label="租户等级">
+                        <el-input v-model="tenantForm.tenantLevel" />
+                    </el-form-item>
+                    <el-form-item label="租户邮箱">
+                        <el-input v-model="tenantForm.email" placeholder="请输入租户邮箱" />
                     </el-form-item>
                 </el-form>
             </div>
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="dialogVisible2 = false">取消</el-button>
-                    <el-button type="primary" @click="dialogVisible2 = false">
+                    <el-button type="primary" @click="handleUpdateTenant">
                         确认
                     </el-button>
                 </span>
@@ -133,11 +129,11 @@
 <script >
 import { ref, defineComponent, reactive, toRefs, } from "vue";
 import { ElMessageBox, ElMessage, } from 'element-plus'
-import { addTenant, deleteTenant, getTenantList } from '@/api/auth'
+import { addTenant, deleteTenant, getTenantList, updateTenant } from '@/api/auth'
 import { onMounted } from "vue";
 
 export default defineComponent({
-    name: "UserRole",
+    name: "TenantRole",
     components: {},
 
     setup() {
@@ -154,6 +150,7 @@ export default defineComponent({
             tenantName: '',
             phonenumber: '',
             adminId: '',
+            tenantId:'',
             email: '',
             address: '',
             email: '',
@@ -217,8 +214,29 @@ export default defineComponent({
                 })
 
         }
+        const handleUpdateTenant = () => {  //修改租户
+            ElMessageBox.confirm('确认提交?')
+                .then(() => {
+                    updateTenant(tenantForm).then(() => {
+                        dialogVisible2.value = false
+                        handleGetTenantList(state.data.page, state.data.limit)
+                    })
+                })
+                .catch(() => {
+                    // catch error
+                })
+        }
+        const handleOpenEdit = (data) => {
+            dialogVisible2.value = true
+            tenantForm.phonenumber = data.phonenumber
+            tenantForm.tenantName = data.tenantName
+            tenantForm.tenantCode = data.tenantCode
+            tenantForm.address = data.address
+            tenantForm.remark = data.remark
+            tenantForm.tenantId = data.tenantId
+        }
 
-        const handleDeleteTenant = (tenantId) => {        //删除租户
+        const handleDeleteTenant = (tenantCode) => {        //删除租户
             ElMessageBox.confirm(
                 '是否要删除该用户?',
                 '提示',
@@ -229,7 +247,7 @@ export default defineComponent({
                 }
             )
                 .then(() => {
-                    deleteTenant(tenantId).then(() => {
+                    deleteTenant(tenantCode).then(() => {
                         handleGetTenantList(state.data.page, state.data.limit)
                         ElMessage({
                             type: 'success',
@@ -254,16 +272,16 @@ export default defineComponent({
             tenantForm,
             tenantRules,
             tableData,
-            handleCurrentChange,
+            handleCurrentChange,handleOpenEdit,
             handleSizeChange,
-            handleDeleteTenant, handleAddTenant, handleGetTenantList,
+            handleDeleteTenant, handleAddTenant, handleGetTenantList,handleUpdateTenant,
             ...toRefs(state),
         };
     },
 });
 </script>
         
-<style rel="stylesheet/scss" lang="scss">
+<style rel="stylesheet/scss" lang="scss" scoped>
 .front {
     background-color: #fff;
     padding: 10px;

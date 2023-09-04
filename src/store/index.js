@@ -9,9 +9,10 @@ export default createStore({
       title: '首页'
     }
     ],
+    routes: [],
   },
   getters: {
-    tagsViewList:state=>state.tagsViewList 
+    tagsViewList: state => state.tagsViewList
   },
   mutations: {
     triggerSidebarOpened(state) {
@@ -22,7 +23,7 @@ export default createStore({
      */
     addTag(state, tag) {
 
-      const isFind = state.tagsViewList.find(function (item)  {
+      const isFind = state.tagsViewList.find(function (item) {
         return item.path === tag.path
       })
       // 处理重复
@@ -37,13 +38,23 @@ export default createStore({
     removeTag(state, payload) {
       if (payload.type === 'index') {
         state.tagsViewList.splice(payload.index, 1)
-      } 
+      }
+    },
+
+    resetParam(state) {
+      state.sidebarOpened = true
+      state.tagsViewList = [{
+        path: '/home',
+        title: '首页'
+      }
+      ]
+      state.routes = []
     },
   },
   actions: {
   },
   modules: {
-    user:user,
-  }
+    user: user,
+  },
 })
 

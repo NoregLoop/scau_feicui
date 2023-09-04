@@ -15,7 +15,7 @@
             <left></left>
           </keep-alive>
         </el-aside>
-        <el-main style="padding-top: 0;">
+        <el-main style="padding-top: 3px;">
           <!-- Body -->
           <el-config-provider :locale="locale"> <!-- 中文配置-->
             <router-view v-slot="{ Component, route }">

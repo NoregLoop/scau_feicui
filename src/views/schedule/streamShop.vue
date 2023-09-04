@@ -1,0 +1,315 @@
+<template>
+  <div class="front">
+    <el-form :model="searchForm" label-width="120px">
+      <el-form-item class="input" label="店铺名称">
+        <el-input v-model="searchForm.name" />
+      </el-form-item>
+      
+    </el-form>
+    <el-button class="search" type="primary">查询</el-button>
+  </div>
+
+
+  <div class="tail">
+    <div class="tail-action">
+      <el-button type="primary" @click="dialogVisible1 = true">新增</el-button>
+      <el-button type="primary">启用</el-button>
+    </div>
+    <el-table :data="tableData()" border style="width: 100%">
+      <el-table-column prop="id" label="店铺编号" min-width="40PX" />
+      <el-table-column prop="shopName" label="平台店铺全称" min-width="60PX" />
+      <el-table-column prop="userInfo" label="店铺简称" min-width="60PX" />
+      <el-table-column prop="userPhone" label="平台类型" min-width="50PX" />
+      <el-table-column prop="status" label="用户状态" width="100" :filters="[
+          { text: '启用', value: 0 },
+          { text: '停用', value: 1 },
+        ]" :filter-method="filterTag" filter-placement="bottom-end">
+          <template #default="scope">
+            <el-tag :type="scope.row.status == 0 ? 'success' : 'danger'" disable-transitions>{{ scope.row.status == 0 ? '启用'
+              : '停用'
+            }}</el-tag>
+          </template>
+        </el-table-column>
+      <el-table-column prop="userPhone" label="店铺授权剩于时间" min-width="80PX" />
+      <el-table-column prop="createBy" label="添加人" min-width="50PX" />
+      <el-table-column prop="remark" label="备注" max-width="60PX" />
+      <el-table-column prop="createTime" label="添加时间" min-width="80PX" />
+      <el-table-column fixed="right" label="操作" min-width="60">
+        <template #default="scope">
+          <el-button link type="primary" size="small" @click="handleOpenEdit(scope.row)">编辑</el-button>
+          <el-button link type="primary" size="small" @click="handleOpenEdit(scope.row)">设置扣点</el-button>
+          <el-button link type="primary" size="small" @click="handleDeleteStreamShop(scope.row.streamShopId)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div class="pagination">
+      <el-pagination v-model:current-page="data.page" v-model:page-size="data.limit"
+        layout="prev, pager, next ,total,sizes" :total="data.total" @current-change="handleCurrentChange"
+        @size-change="handleSizeChange" />
+    </div>
+  </div>
+
+  <div class="dialog-list">
+    <el-dialog v-model="dialogVisible1" title="新建角色" width="30%" :close-on-click-modal="true" :show-close="false">
+      <div>
+        <el-form :model="streamShopForm" label-width="120px" :rules="streamShopRules">
+          <el-form-item label="角色名称" prop="streamShopName" :required="true">
+            <el-input v-model="streamShopForm.streamShopName" />
+          </el-form-item>
+          <el-form-item label="权限字符" prop="streamShopName" :required="true">
+            <el-input v-model="streamShopForm.streamShopKey" />
+          </el-form-item>
+          <el-form-item label="角色顺序" :required="true">
+            <el-input v-model="streamShopForm.streamShopSort" />
+          </el-form-item>
+          <el-form-item label="角色权限">
+            <el-checkbox-group v-model="streamShopForm.menuIds" class="form-add-checkbox">
+              <el-checkbox label="001" class="form-add-checkbox-item">入库管理</el-checkbox>
+              <el-checkbox label="002" class="form-add-checkbox-item">出库管理</el-checkbox>
+              <el-checkbox label="003" class="form-add-checkbox-item">库存管理</el-checkbox>
+              <el-checkbox label="004" class="form-add-checkbox-item">销售管理</el-checkbox>
+              <el-checkbox label="005" class="form-add-checkbox-item">财务管理</el-checkbox>
+              <el-checkbox label="006" class="form-add-checkbox-item">客户管理</el-checkbox>
+              <el-checkbox label="007" class="form-add-checkbox-item">排班管理</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+        </el-form>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible1 = false">取消</el-button>
+          <el-button type="primary" @click="handleAddStreamShop">
+            确认
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="dialogVisible2" title="编辑用户" width="30%" :before-close="handleClose" :show-close="false">
+      <div>
+        <el-form :model="streamShopForm" label-width="120px">
+          <el-form-item label="角色名称" prop="streamShopName" :required="true">
+            <el-input v-model="streamShopForm.streamShopName" />
+          </el-form-item>
+          <el-form-item label="权限字符" prop="streamShopName" :required="true">
+            <el-input v-model="streamShopForm.streamShopKey" />
+          </el-form-item>
+          <el-form-item label="角色权限">
+            <el-checkbox-group v-model="streamShopForm.menuIds" class="form-add-checkbox">
+              <el-checkbox label="001" class="form-add-checkbox-item">入库管理</el-checkbox>
+              <el-checkbox label="002" class="form-add-checkbox-item">出库管理</el-checkbox>
+              <el-checkbox label="003" class="form-add-checkbox-item">库存管理</el-checkbox>
+              <el-checkbox label="004" class="form-add-checkbox-item">销售管理</el-checkbox>
+              <el-checkbox label="005" class="form-add-checkbox-item">财务管理</el-checkbox>
+              <el-checkbox label="006" class="form-add-checkbox-item">客户管理</el-checkbox>
+              <el-checkbox label="007" class="form-add-checkbox-item">排班管理</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+        </el-form>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible2 = false">取消</el-button>
+          <el-button type="primary" @click="dialogVisible2 = false">
+            确认
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+  </div>
+</template>
+     
+<script >
+import { ref, defineComponent, reactive, toRefs, } from "vue";
+import { ElMessageBox, ElMessage } from 'element-plus'
+import { onMounted } from "vue";
+import { addStreamShop, getStreamShopList } from "@/api/schedule"
+
+export default defineComponent({
+  name: "StreamShop",
+  components: {},
+
+  setup() {
+    let streamShopData = reactive({
+      data: [],
+    });
+    const streamShopForm = reactive({
+      streamShopName: '',
+      streamShopKey: '',
+      streamShopSort: '1',
+      menuIds: [],
+      remark: '',
+      status: 0,
+      password: '',
+    });
+    const searchForm = reactive({
+      name: '',
+
+    });
+    let dialogVisible1 = ref(false)
+    const dialogVisible2 = ref(false)
+    const streamShopRules = reactive({
+      streamShopName: [{ required: true, message: '请输入内容', trigger: 'blur' },
+      { min: 3, max: 10, message: '账号长度 在 3 到 10长度之间', trigger: 'blur' }],
+    });
+
+
+    //表格用到的参数
+    let state = reactive({
+      data: {
+        page: 1,
+        limit: 10,
+        total: streamShopData.data.length,
+      }
+    });
+
+    const filterTag = (value, row) => {
+      return row.status == value
+    }
+    onMounted(() => {
+      handleGetStreamShopList(state.data.page, state.data.limit)
+    })
+
+
+    const handleGetStreamShopList = (page, limit) => {
+      getStreamShopList(page, limit).then((res) => {
+        streamShopData.data = res.rows
+        state.data.total = res.total
+      })
+    }
+    const tableData = () => {
+      return streamShopData.data
+    };
+    //改变页码
+    const handleCurrentChange = (e) => {
+      state.page = e;
+      handleGetStreamShopList(e, state.data.limit)
+    };
+    //改变页数限制
+    const handleSizeChange = (e) => {
+      state.limit = e;
+      handleGetStreamShopList(state.data.page, e)
+    };
+
+    //添加角色
+    const handleAddStreamShop = () => {
+      ElMessageBox.confirm('确认提交?')
+        .then(() => {
+          streamShopForm.streamShopKey = streamShopForm.streamShopName
+          addStreamShop(streamShopForm).then(() => {
+            dialogVisible1.value = false
+            handleGetStreamShopList(state.data.page, state.data.limit)
+          })
+        })
+        .catch(() => {
+          // catch error
+        })
+
+    }
+
+    const handleDeleteStreamShop = (streamShopId) => { //删除角色
+      ElMessageBox.confirm(
+        '是否要删除该用户?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+        }
+      )
+        .then(() => {
+          deleteStreamShop(streamShopId).then(() => {
+            handleGetStreamShopList(state.data.page, state.data.limit)
+            ElMessage({
+              type: 'success',
+              message: '删除成功',
+            })
+          })
+        }).catch(() => {
+          ElMessage({
+            type: 'info',
+            message: '取消操作',
+          })
+        })
+    }
+
+    const handleOpenEdit = (data) => { //打开编辑角色
+      dialogVisible2.value = true
+      streamShopForm.streamShopName = data.streamShopName
+      streamShopForm.streamShopKey = data.streamShopName
+      streamShopForm.menuIds = data.menuIds
+
+    }
+
+    const handleClose = (e) => { //提交表单
+      ElMessageBox.confirm('确认提交?')
+        .then(() => {
+          done()
+        })
+        .catch(() => {
+          // catch error
+        })
+    }
+
+    return {
+      streamShopData,
+      dialogVisible1,
+      dialogVisible2,
+      searchForm,
+      streamShopForm,
+      streamShopRules,
+      tableData, filterTag,
+      handleCurrentChange,
+      handleSizeChange,
+      handleClose,
+      handleDeleteStreamShop, handleAddStreamShop, handleGetStreamShopList,
+      handleOpenEdit,
+      ...toRefs(state),
+    };
+  },
+});
+</script>
+    
+<style rel="stylesheet/scss" lang="scss" scoped>
+.front {
+  background-color: #fff;
+  padding: 10px;
+  display: flex;
+
+  .input {
+    float: left;
+  }
+
+  .search {
+    margin-left: 50px;
+  }
+}
+
+.center {
+  margin: 10px;
+}
+
+.form-add-checkbox {
+  width: 200px;
+  height: 260px;
+  display: block;
+  border: solid 1px #c9c9c9;
+
+  .form-add-checkbox-item {
+    width: 180px;
+    margin: auto;
+  }
+}
+
+.tail {
+  background-color: #fff;
+  margin-top: 40px;
+  padding: 10px;
+
+  .tail-action {
+    margin-bottom: 10px;
+    display: flex;
+  }
+}
+</style>

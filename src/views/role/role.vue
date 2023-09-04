@@ -20,19 +20,19 @@
       <el-table-column prop="roleId" label="角色ID" min-width="60" />
       <el-table-column prop="roleName" label="角色名称" min-width="60" />
       <el-table-column prop="roleKey" label="角色权限" min-width="60" />
-      <el-table-column prop="status" label="用户状态" width="100" :filters="[
-        { text: '启用', value: 1 },
-        { text: '停用', value: 0 },
+      <el-table-column prop="status" label="角色状态" width="100" :filters="[
+        { text: '启用', value: 0 },
+        { text: '停用', value: 1 },
       ]" :filter-method="filterTag" filter-placement="bottom-end">
         <template #default="scope">
-          <el-tag :type="scope.row.status == 1 ?'success' :'danger' " disable-transitions>{{ scope.row.status==1?'启用':'停用' }}</el-tag>
+          <el-tag :type="scope.row.status == 0 ?'success' :'danger' " disable-transitions>{{ scope.row.status==0?'启用':'停用' }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="remark" label="备注" min-width="60" />
       <el-table-column prop="createTime" label="创建时间" min-width="60" />
       <el-table-column fixed="right" label="Operations" min-width="60">
         <template #default="scope">
-          <el-button link type="primary" size="small" @click="handleOpenEdit">编辑</el-button>
+          <el-button link type="primary" size="small" @click="handleOpenEdit(scope.row)">编辑</el-button>
           <el-button link type="primary" size="small" @click="handleDeleteRole(scope.row.roleId)">删除</el-button>
         </template>
       </el-table-column>
@@ -83,23 +83,22 @@
     <el-dialog v-model="dialogVisible2" title="编辑用户" width="30%" :before-close="handleClose" :show-close="false">
       <div>
         <el-form :model="roleForm" label-width="120px">
-          <el-form-item label="用户名称">
-            <el-input v-model="roleForm.userName" />
+          <el-form-item label="角色名称" prop="roleName" :required="true">
+            <el-input v-model="roleForm.roleName" />
           </el-form-item>
-          <el-form-item label="手机电话">
-            <el-input v-model="roleForm.phone" />
+          <el-form-item label="权限字符" prop="roleName" :required="true">
+            <el-input v-model="roleForm.roleKey" />
           </el-form-item>
-          <el-form-item label="用户账号">
-            <el-input v-model="roleForm.account" />
-          </el-form-item>
-          <el-form-item label="用户密码">
-            <el-input v-model="roleForm.password" />
-          </el-form-item>
-          <el-form-item label="角色选择">
-            <el-select v-model="roleForm.role" placeholder="请选择该用户角色">
-              <el-option label="采购" value="shanghai" />
-              <el-option label="管理" value="beijing" />
-            </el-select>
+          <el-form-item label="角色权限">
+            <el-checkbox-group v-model="roleForm.menuIds" class="form-add-checkbox">
+              <el-checkbox label="001" class="form-add-checkbox-item">入库管理</el-checkbox>
+              <el-checkbox label="002" class="form-add-checkbox-item">出库管理</el-checkbox>
+              <el-checkbox label="003" class="form-add-checkbox-item">库存管理</el-checkbox>
+              <el-checkbox label="004" class="form-add-checkbox-item">销售管理</el-checkbox>
+              <el-checkbox label="005" class="form-add-checkbox-item">财务管理</el-checkbox>
+              <el-checkbox label="006" class="form-add-checkbox-item">客户管理</el-checkbox>
+              <el-checkbox label="007" class="form-add-checkbox-item">排班管理</el-checkbox>
+            </el-checkbox-group>
           </el-form-item>
         </el-form>
       </div>
@@ -133,7 +132,7 @@ export default defineComponent({
     const roleForm = reactive({
       roleName: '',
       roleKey: '',
-      roleSort: '',
+      roleSort: '1',
       menuIds: [],
       remark: '',
       status: 0,
@@ -192,6 +191,7 @@ export default defineComponent({
     const handleAddRole = () => {
       ElMessageBox.confirm('确认提交?')
         .then(() => {
+          roleForm.roleKey=roleForm.roleName
           addRole(roleForm).then(() => {
             dialogVisible1.value = false
             handleGetRoleList(state.data.page, state.data.limit)
@@ -205,7 +205,7 @@ export default defineComponent({
 
     const handleDeleteRole = (roleId) => { //删除角色
       ElMessageBox.confirm(
-        '是否要删除该用户?',
+        '是否要删除该角色?',
         '提示',
         {
           confirmButtonText: '确定',
@@ -229,8 +229,12 @@ export default defineComponent({
         })
     }
 
-    const handleOpenEdit = () => { //打开编辑角色
+    const handleOpenEdit = (data) => { //打开编辑角色
       dialogVisible2.value = true
+      roleForm.roleName=data.roleName
+      roleForm.roleKey=data.roleName
+      roleForm.menuIds=data.menuIds
+
     }
 
     const handleClose = (e) => { //提交表单
@@ -262,7 +266,7 @@ export default defineComponent({
 });
 </script>
     
-<style rel="stylesheet/scss" lang="scss">
+<style rel="stylesheet/scss" lang="scss" scoped>
 .front {
   background-color: #fff;
   padding: 10px;

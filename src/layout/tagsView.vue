@@ -1,7 +1,7 @@
 <template>
   <transition>
     <div class="tags-view-container">
-      <el-scrollbar id="tags-view-list"
+      <el-scrollbar id="tags-view-list" class="tags"
         v-bind:class="{ id01: store.state.sidebarIsCollaspe, id02: !store.state.sidebarIsCollaspe }">
         <router-link class="tags-view-item" v-for="(tag, index) in store.state.tagsViewList" :to="{ path: tag.path }"
           @contextmenu.prevent="openMenu($event, index)">
@@ -89,6 +89,10 @@ watch(visible, val => {
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
+.tags-view-container {
+  height: 30px;
+}
+
 #tags-view-list {
   display: flex;
   width: 80%;
@@ -100,7 +104,8 @@ watch(visible, val => {
   padding: 1px;
   border-radius: 10%;
   margin-left: 10px;
-  font-size: xx-small;
+  font-size: small;
+  font-family: SimSun, STSong, serif;
 
 }
 

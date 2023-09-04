@@ -1,5 +1,5 @@
 {
-  "name": "scau_ERP",
+  "name": "ERP",
   "version": "0.1.0",
   "author": "scau404",
   "private": true,
@@ -17,14 +17,16 @@
     "element-plus": "^2.3.4",
     "jsbarcode": "^3.11.5",
     "jsencrypt": "^3.3.2",
-    "mockjs": "^1.1.0",
     "node-polyfill-webpack-plugin": "^2.0.1",
+    "resize-observer": "^1.0.4",
     "style-loader": "^3.3.2",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
     "vue-style-loader": "^4.1.3",
+    "vue-web-cam": "^1.9.0",
     "vue3-print-nb": "^0.1.4",
-    "vuex": "^4.1.0"
+    "vuex": "^4.1.0",
+    "webcamjs": "^1.0.26"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.3",

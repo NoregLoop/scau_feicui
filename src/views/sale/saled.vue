@@ -137,7 +137,7 @@ export default defineComponent({
 });
 </script>
 
-<style rel="stylesheet/scss" lang="scss">
+<style rel="stylesheet/scss" lang="scss" scoped>
 .front {
     background-color: #fff;
     margin: 10px;

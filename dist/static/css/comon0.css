@@ -57,7 +57,7 @@ html,body{height: 100%;}
 .bar1 img{ width: .4rem; margin-right: .15rem;;}
 .bar1{ display: flex; justify-content: center; align-items: center;}
 .bar1 span{ color: #fff; font-size: .16rem; display: block; font-weight: normal;}
-.bar1 h3{ color: #fef000; font-size: .22rem;;}
+.bar1 h3 span{ color: #fef000; font-size: .22rem;;}
 .row1 li{ padding: .2rem .1rem 0 .1rem;}
 .row1{margin-left: -.1rem; margin-right: -.1rem;}
 .row1 .bar2{ background: url(../images/bg02.png) no-repeat; background-size: 100% 100%;}

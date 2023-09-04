@@ -22,12 +22,14 @@
       <el-table-column prop="userId" label="用户ID" min-width="60" />
       <el-table-column prop="userName" label="手机号" min-width="60" />
       <el-table-column prop="nickName" label="用户名" min-width="60" />
+      <el-table-column prop="roleName" label="角色" min-width="60" :formatter="roleData"/>
       <el-table-column prop="status" label="用户状态" width="100" :filters="[
-        { text: '启用', value: 1 },
         { text: '停用', value: 0 },
+        { text: '启用', value: 1 },
       ]" :filter-method="filterTag" filter-placement="bottom-end">
         <template #default="scope">
-          <el-tag :type="scope.row.status == 1 ? 'success' : 'danger'" disable-transitions>{{ scope.row.status == 1 ? '启用' : '停用'
+          <el-tag :type="scope.row.status == 0 ? 'success' : 'danger'" disable-transitions>{{ scope.row.status == 1 ? '停用'
+            : '启用'
           }}</el-tag>
         </template>
       </el-table-column>
@@ -64,9 +66,8 @@
             <el-input v-model="userForm.password" placeholder="请输入密码" />
           </el-form-item>
           <el-form-item label="角色选择">
-            <el-select v-model="userForm.tenantId" placeholder="请选择该用户角色">
-              <el-option label="采购" value="1" />
-              <el-option label="管理" value="2" />
+            <el-select v-model="userForm.roleIds" placeholder="请选择该用户角色">
+              <el-option v-for="item in roleList" :key="item.roleId" :label="item.roleName" :value="item.roleId" />
             </el-select>
           </el-form-item>
         </el-form>
@@ -94,9 +95,8 @@
             <el-input v-model="userForm.remark" />
           </el-form-item>
           <el-form-item label="角色选择">
-            <el-select v-model="userForm.role" placeholder="请选择该用户角色">
-              <el-option label="采购" value="shanghai" />
-              <el-option label="管理" value="beijing" />
+            <el-select v-model="userForm.roleIds" placeholder="请选择该用户角色">
+              <el-option v-for="item in roleList" :key="item.roleId" :label="item.roleName" :value="item.roleId" />
             </el-select>
           </el-form-item>
         </el-form>
@@ -117,25 +117,23 @@
 import { ref, defineComponent, reactive, toRefs, } from "vue";
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { addUser, getUserList, deleteUser, getRoleList, updateUser, search, changeStatus } from '@/api/auth'
-import { onMounted } from "vue";
+import { onMounted, onBeforeMount } from "vue";
 
 export default defineComponent({
-  name: "UserRole",
+  name: "User",
   components: {},
 
   setup() {
-
-    let userData = reactive({
+    let userData = reactive({//表格数据
       data: [],
-      roleList: [],
     });
 
+    const roleList = ref([])
     const searchForm = reactive({
       userName: '',
       nickName: '',
       status: 0,
     });
-
     const userForm = reactive({
       userName: '',
       nickName: '',
@@ -146,33 +144,32 @@ export default defineComponent({
       deptId: 1,
       userId: 0,
     });
-    //表格用到的参数
-    let state = reactive({
-      data: {
-        page: 1,
-        limit: 10,
-        total: userData.data.length,
-      }
-    });
     let statusForm = reactive({
       data: {
         userId: 0,
         status: 0,
       }
     });
-
     const clearForm = () => {
-      console.log(userForm)
     }
     const filterTag = (value, row) => {
       return row.status == value
     }
-
+    const roleData=(row)=>{
+      
+      let role=''
+      row.roles.forEach((item, index)=>{
+        role=role+item.roleName+','
+      })
+      return role.substring(0, role.length - 1);
+    }
+    onBeforeMount(() => {//获取数据
+      getRoleList().then((res) => {
+        roleList.value = res.rows
+      })
+    })
 
     onMounted(() => {
-      getRoleList().then((res) => {
-        userData.roleList = res.data
-      })
       handleGetUserList(state.data.page, state.data.limit)
     })
 
@@ -197,25 +194,28 @@ export default defineComponent({
       { min: 2, max: 10, message: '长度 在 5 到 10长度之间', trigger: 'blur' }],
     });
 
+    //表格用到的参数
+    let state = reactive({
+      data: {
+        page: 1,
+        limit: 10,
+        total: userData.data.length,
+      }
+    });
+    //分页处理
     const tableData = () => {
       return userData.data
-      // return userData.data.filter(
-      //   (item, index) =>
-      //     index < state.data.page * state.data.limit &&
-      //     index >= state.data.limit * (state.data.page - 1)
-      // );
-    };
 
-    //改变页码
-    const handleCurrentChange = (e) => {
+    };
+    const handleCurrentChange = (e) => {//改变页码
       state.data.page = e;
       handleGetUserList(e, state.data.limit)
-    };
-    //改变页数限制
-    const handleSizeChange = (e) => {
+    }; 
+    const handleSizeChange = (e) => {//改变页数限制
       state.data.limit = e;
       handleGetUserList(state.data.page, e)
     };
+
 
     const selectUser = (select, row) => {
       statusForm.data.userId = row.userId
@@ -235,7 +235,7 @@ export default defineComponent({
         state.data.total = res.total
       })
     }
-    const handleGetUserList = (page, limit) => {
+    const handleGetUserList = (page, limit) => {//获取用户列表
       getUserList(page, limit).then((res) => {
         userData.data = res.rows
         state.data.total = res.total
@@ -245,13 +245,17 @@ export default defineComponent({
     const handleAddUser = () => {    //添加用户
       ElMessageBox.confirm('确认提交?')
         .then(() => {
+          let t = userForm.roleIds
+          userForm.roleIds = [t]
           addUser(userForm).then(() => {
             dialogVisible1.value = false
             handleGetUserList(state.data.page, state.data.limit)
+          }).catch(() => {
+            ElMessage.error('提交失败')
           })
         })
         .catch(() => {
-          // catch error
+
         })
 
     }
@@ -303,12 +307,10 @@ export default defineComponent({
 
     return {
       userData,
-      dialogVisible1,
-      dialogVisible2,
-      searchForm,
-      userForm,
-      userRules,
-      tableData, clearForm, filterTag,selectUser,
+      dialogVisible1, dialogVisible2,
+      searchForm, userForm,
+      roleList, userRules,
+      tableData, clearForm, filterTag, selectUser,roleData,
       handleCurrentChange,
       handleSizeChange, openUpdate, handleSearch, handleChangeStatus,
       handleDeleteUser, handleAddUser, handleGetUserList, handleUpdateUser,
@@ -318,7 +320,7 @@ export default defineComponent({
 });
 </script>
       
-<style rel="stylesheet/scss" lang="scss">
+<style rel="stylesheet/scss" lang="scss" scoped>
 .front {
   background-color: #fff;
   padding: 10px;
