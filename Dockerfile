@@ -13,8 +13,12 @@ RUN npm install
 # 将项目文件复制到工作目录
 COPY . .
 
+# 更改文件和文件夹的权限
+RUN chown -R www-data:www-data /var/www/html
+
 # 构建项目
 RUN npm run build
+
 
 # 使用Nginx镜像作为基础镜像
 FROM nginx:1.21.1
