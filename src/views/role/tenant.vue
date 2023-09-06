@@ -17,7 +17,6 @@
         </div>
         <el-table :data="tableData()" border style="width: 100%">
             <el-table-column type="selection" min-width="40" />
-            <el-table-column type="index" lable="序号" min-width="40" />
             <el-table-column prop="tenantCode" label="租户编码" min-width="60" />
             <el-table-column prop="tenantName" label="租户名称" min-width="60" />
             <el-table-column prop="phonenumber" label="手机号" min-width="60" />

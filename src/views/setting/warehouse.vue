@@ -19,7 +19,7 @@
             <el-table-column prop="createBy" label="创建人" min-width="60" />
             <el-table-column prop="createTime" label="创建时间" min-width="60" />
             <el-table-column prop="remark" label="备注" min-width="60" />
-            <el-table-column prop="isInOk" label="允许入库" min-width="80" :filters="[
+            <el-table-column prop="isInOk" label="允许入库" min-width="80" :filter-multiple="false" :filters="[
                 { text: '允许', value: 1 },
                 { text: '禁止', value: 0 },
             ]" :filter-method="filterTag" filter-placement="bottom-end">
@@ -28,7 +28,7 @@
                         scope.row.status == 1 ? '允许' : '禁止' }}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="isOutOk" label="允许出库" min-width="80" :filters="[
+            <el-table-column prop="isOutOk" label="允许出库" min-width="80" :filter-multiple="false" :filters="[
                 { text: '允许', value: 1 },
                 { text: '禁止', value: 0 },
             ]" :filter-method="filterTag" filter-placement="bottom-end">
@@ -37,7 +37,7 @@
                         scope.row.status == 1 ? '允许' : '禁止' }}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="status" label="状态" min-width="80" :filters="[
+            <el-table-column prop="status" label="状态" min-width="80" :filter-multiple="false" :filters="[
                 { text: '启用', value: 1 },
                 { text: '停用', value: 0 },
             ]" :filter-method="filterTag" filter-placement="bottom-end">

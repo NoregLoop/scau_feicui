@@ -19,7 +19,7 @@
             <el-table-column prop="createBy" label="创建人" min-width="60" />
             <el-table-column prop="createTime" label="创建时间" min-width="60" />
             <el-table-column prop="remark" label="备注" min-width="60" />
-            <el-table-column prop="status" label="状态" min-width="80" :filters="[
+            <el-table-column prop="status" label="状态" min-width="80" :filter-multiple="false" :filters="[
                 { text: '启用', value: 1 },
                 { text: '停用', value: 0 },
             ]" :filter-method="filterTag" filter-placement="bottom-end">

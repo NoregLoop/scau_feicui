@@ -18,14 +18,13 @@
     </div>
     <el-table :data="tableData()" border style="width: 100%" @select="selectUser">
       <el-table-column type="selection" min-width="40" />
-      <el-table-column type="index" lable="序号" min-width="40" />
       <el-table-column prop="userId" label="用户ID" min-width="60" />
-      <el-table-column prop="userName" label="手机号" min-width="60" />
       <el-table-column prop="nickName" label="用户名" min-width="60" />
-      <el-table-column prop="roleName" label="角色" min-width="60" :formatter="roleData"/>
-      <el-table-column prop="status" label="用户状态" width="100" :filters="[
-        { text: '停用', value: 0 },
-        { text: '启用', value: 1 },
+      <el-table-column prop="roleName" label="用户角色" min-width="60" :formatter="roleData"/>
+      <el-table-column prop="userName" label="手机号" min-width="60" />
+      <el-table-column prop="status" label="用户状态" width="100" :filter-multiple="false" :filters="[
+        { text: '停用', value: 1 },
+        { text: '启用', value: 0 },
       ]" :filter-method="filterTag" filter-placement="bottom-end">
         <template #default="scope">
           <el-tag :type="scope.row.status == 0 ? 'success' : 'danger'" disable-transitions>{{ scope.row.status == 1 ? '停用'
@@ -33,8 +32,8 @@
           }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="remark" label="备注" min-width="60" />
       <el-table-column prop="createTime" label="创建时间" min-width="60" />
+      <el-table-column prop="remark" label="备注" min-width="60" />
       <el-table-column fixed="right" label="Operations" width="120PX">
         <template #default="scope">
           <el-button link type="primary" size="small" @click="openUpdate(scope.row)">编辑</el-button>
@@ -59,16 +58,17 @@
           <el-form-item label="用户名" prop="nickName" :required="true">
             <el-input v-model="userForm.nickName" placeholder="请输入用户名" />
           </el-form-item>
-          <el-form-item label="备注">
-            <el-input v-model="userForm.remark" />
-          </el-form-item>
+
           <el-form-item label="用户密码" :required="true">
-            <el-input v-model="userForm.password" placeholder="请输入密码" />
+            <el-input v-model="userForm.password" show-password placeholder="请输入密码" />
           </el-form-item>
           <el-form-item label="角色选择">
             <el-select v-model="userForm.roleIds" placeholder="请选择该用户角色">
               <el-option v-for="item in roleList" :key="item.roleId" :label="item.roleName" :value="item.roleId" />
             </el-select>
+          </el-form-item>
+          <el-form-item label="备注">
+            <el-input v-model="userForm.remark" />
           </el-form-item>
         </el-form>
       </div>

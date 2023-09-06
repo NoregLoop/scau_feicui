@@ -16,11 +16,10 @@
     </div>
     <el-table :data="tableData()" border style="width: 100%">
       <el-table-column type="selection" min-width="40" />
-      <el-table-column type="index" min-width="40" />
       <el-table-column prop="roleId" label="角色ID" min-width="60" />
       <el-table-column prop="roleName" label="角色名称" min-width="60" />
       <el-table-column prop="roleKey" label="角色权限" min-width="60" />
-      <el-table-column prop="status" label="角色状态" width="100" :filters="[
+      <el-table-column prop="status" label="角色状态" width="100" :filter-multiple="false" :filters="[
         { text: '启用', value: 0 },
         { text: '停用', value: 1 },
       ]" :filter-method="filterTag" filter-placement="bottom-end">
